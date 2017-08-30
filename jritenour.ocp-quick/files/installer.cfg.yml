@@ -1,0 +1,19 @@
+version: v2 
+variant: openshift-enterprise 
+variant_version: 3.6 
+ansible_log_path: /tmp/ansible.log 
+deployment:
+  ansible_ssh_user: root 
+  hosts: 
+  - ip: 192.168.2.45
+    hostname: ocp.master.home.lab
+    roles: 
+      - master
+      - node
+    containerized: true 
+    connect_to: 192.168.2.45
+  - ip: 192.168.2.46
+    hostname: ocp-node.home.lab
+    roles:
+      - node
+    connect_to: 192.168.2.46

@@ -1,0 +1,3 @@
+---
+  - name: Install OpenShift unattended
+    command: atomic-openshift-installer -u -c files/install.cfg.yml install
