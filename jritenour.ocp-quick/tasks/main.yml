@@ -1,3 +1,28 @@
 ---
+  - name: Register with Red Hat Subscription Manager
+    command: subscription-manager register --username={{ rhn_user }} --password={{ rhn_pass }} --force
+  - name: Attach subscription
+    command: subscription-manager attach --pool="{{ rhn_pool }}"
+  - name: Disable all repos
+    command: subscription-manager repos --disable "*"
+  - name: Enable necessary repos
+    command: subscription-manager repos --enable --enable="rhel-7-server-rpms"     --enable="rhel-7-server-extras-rpms"     --enable="rhel-7-server-ose-3.6-rpms"     --enable="rhel-7-fast-datapath-rpms"
+  - name: Install necessary packages
+    yum:  
+      name: '{{ item }}'
+      state: present
+    with_items: 
+    - wget 
+    - git 
+    - net-tools 
+    - bind-utils 
+    - iptables-services 
+    - bridge-utils 
+    - bash-completion 
+    - kexec-tools 
+    - sos 
+    - psacct
+    - atomic-openshift-utils
+    - docker-1.12.6
   - name: Install OpenShift unattended
     command: atomic-openshift-installer -u -c files/install.cfg.yml install
