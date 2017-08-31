@@ -6,7 +6,7 @@
   - name: Disable all repos
     command: subscription-manager repos --disable "*"
   - name: Enable necessary repos
-    command: subscription-manager repos --enable --enable="rhel-7-server-rpms"     --enable="rhel-7-server-extras-rpms"     --enable="rhel-7-server-ose-3.6-rpms"     --enable="rhel-7-fast-datapath-rpms"
+    command: subscription-manager repos --enable="rhel-7-server-rpms"     --enable="rhel-7-server-extras-rpms"     --enable="rhel-7-server-ose-3.6-rpms"     --enable="rhel-7-fast-datapath-rpms"
   - name: Install necessary packages
     yum:  
       name: '{{ item }}'
@@ -24,5 +24,18 @@
     - psacct
     - atomic-openshift-utils
     - docker-1.12.6
+  - name: configure docker storage
+    template:
+      src: docker-storage-setup.j2
+      dest: /etc/sysconfig/docker-storage-setup
+      owner: root
+      group: root
+      mode: 0644
+  - name: start and enable Docker
+    service:
+      name: docker
+      state: started
+      enabled: true
   - name: Install OpenShift unattended
-    command: atomic-openshift-installer -u -c files/install.cfg.yml install
+    command: atomic-openshift-installer -u -c ~/installer.cfg.yml install
+    when: "'master' in group_names"

@@ -17,3 +17,6 @@ deployment:
     roles:
       - node
     connect_to: 192.168.2.46
+  roles:
+    master:
+    node:
