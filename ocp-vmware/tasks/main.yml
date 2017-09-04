@@ -1,0 +1,63 @@
+---
+# tasks file for jritenour.vmware-cf-miq
+  - name: create the VM
+    vmware_guest:
+      hostname: "{{ vcenter_ip }}"
+      username: "{{ vcenter_user }}"
+      password: "{{ vcenter_pass }}"
+      validate_certs: no
+      esxi_hostname: "{{ esx_host }}"
+      datacenter: "{{ vc_datacenter }}"
+      name: "{{ vm_name }}"
+      state: poweredon
+      disk:
+      - size_gb: 40
+        type: thin
+        datastore: "{{ vc_datastore }}"
+      - size_gb: "{{ db_size }}"
+        type: thin
+        datastore: "{{ vc_datastore }}"
+      - size_gb: 40
+        type: thin
+        dastore: " {{ vc_datastore }} "
+        when: master
+      hardware:
+        memory_mb: 16384
+        num_cpus: 2
+      template: "{{ template_name }}"
+      networks:
+      - name: VM Network
+        ip: "{{ ip_addr }}"
+        netmask: "{{ mask }}"
+        gateway: "{{ gateway }}"
+        domain: "{{ domain }}"
+        dns_servers:
+        - "{{ dns1 }}"
+      customization:
+        dns_servers:
+        - "{{ dns1 }}"
+        runonce: 
+        - hostnamectl set-hostname "{{ vm_name }}"."{{ domain }}"
+      wait_for_ip_address: yes
+    delegate_to: localhost
+    register: deploy
+
+  - name: Debugging instance info
+    debug:
+      var: deploy.instance.hw_eth0.ipaddresses[0]
+
+  - name: add master server to inventory
+    add_host:
+      hostname: "{{ ip_addr }}"
+      ansible_ssh_user: root
+      ansible_ssh_pass: "{{ cf_ssh_pass }}"
+      groupname: master
+    when: master
+
+  - name: add nodes to inventory
+    add_host:
+      hostname: "{{ ip_addr }}"
+      ansible_ssh_user: root
+      ansible_ssh_pass: "{{ cf_ssh_pass }}"
+      groupname: node
+    when: node

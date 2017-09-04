@@ -5,18 +5,18 @@ ansible_log_path: /tmp/ansible.log
 deployment:
   ansible_ssh_user: root 
   hosts: 
-  - ip: 192.168.2.45
-    hostname: ocp.master.home.lab
+  - ip: 192.168.2.30
+    hostname: ocp-master-1.home.lab
     roles: 
       - master
       - node
     containerized: true 
-    connect_to: 192.168.2.45
-  - ip: 192.168.2.46
-    hostname: ocp-node.home.lab
+    connect_to: 192.168.2.30
+  - ip: 192.168.2.31
+    hostname: ocp-node-1.home.lab
     roles:
       - node
-    connect_to: 192.168.2.46
+    connect_to: 192.168.2.30
   roles:
     master:
     node:
