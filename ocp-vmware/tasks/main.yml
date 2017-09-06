@@ -11,16 +11,12 @@
       name: "{{ vm_name }}"
       state: poweredon
       disk:
-      - size_gb: 40
+      - size_gb: 60
         type: thin
         datastore: "{{ vc_datastore }}"
       - size_gb: "{{ db_size }}"
         type: thin
         datastore: "{{ vc_datastore }}"
-      - size_gb: 40
-        type: thin
-        dastore: " {{ vc_datastore }} "
-        when: master
       hardware:
         memory_mb: 16384
         num_cpus: 2
@@ -37,7 +33,7 @@
         dns_servers:
         - "{{ dns1 }}"
         runonce: 
-        - hostnamectl set-hostname "{{ vm_name }}"."{{ domain }}"
+        - hostnamectl set-hostname "{{ vm_name }}.{{ domain }}"
       wait_for_ip_address: yes
     delegate_to: localhost
     register: deploy

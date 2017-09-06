@@ -36,6 +36,12 @@
       name: docker
       state: started
       enabled: true
+  - name: Copy installer config
+    copy:
+      src: files/installer.cfg.yml
+      dest: /root/installer.cfg.yml
+    when: "'master' in group_names"
   - name: Install OpenShift unattended
     command: atomic-openshift-installer -u -c ~/installer.cfg.yml install
     when: "'master' in group_names"
+    ignore_errors: True

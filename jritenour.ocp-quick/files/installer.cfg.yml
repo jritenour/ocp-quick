@@ -10,13 +10,13 @@ deployment:
     roles: 
       - master
       - node
-    containerized: true 
+    containerized: false
     connect_to: 192.168.2.30
   - ip: 192.168.2.31
     hostname: ocp-node-1.home.lab
     roles:
       - node
-    connect_to: 192.168.2.30
+    connect_to: 192.168.2.31
   roles:
     master:
     node:
