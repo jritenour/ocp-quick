@@ -1,3 +1,4 @@
 *.retry	
 roles/jritenour.cf-variables/vars/*
 inventory
+.gitignore
