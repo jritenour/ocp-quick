@@ -3,8 +3,8 @@
   connection: local
   gather_facts: no
   remote_user: root
-#  vars_files:
-#    - '../main.yml'
+  vars_files:
+    - '../main.yml'
   vars:
     type: master
     master: true
@@ -22,14 +22,14 @@
     master: false
     node: true
     ip_addr: "{{ node1 }}"
-#  vars_files:
-#    - '../main.yml'
+  vars_files:
+    - '../main.yml'
   roles:
     - {role: 'ocp-vmware'}
 
 - hosts: all
   remote_user: root
-#  vars_files:
-#    - '../main.yml'
+  vars_files:
+    - '../main.yml'
   roles:
-    - {role: 'jritenour.ocp-quick'}
+    - {role: 'ocp-quick'}

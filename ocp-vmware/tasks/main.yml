@@ -1,5 +1,12 @@
 ---
 # tasks file for jritenour.vmware-cf-miq
+
+  - name: Generate
+    shell: openssl rand -hex 2
+    register: uuid_list
+  - name: Debugging instance info
+    debug:
+      var: uuid_list.stdout
   - name: create the VM
     vmware_guest:
       hostname: "{{ vcenter_ip }}"
@@ -8,7 +15,7 @@
       validate_certs: no
       esxi_hostname: "{{ esx_host }}"
       datacenter: "{{ vc_datacenter }}"
-      name: "{{ vm_name }}"
+      name: "{{ vm_name }}-{{ uuid_list.stdout }}"
       state: poweredon
       disk:
       - size_gb: 60
@@ -33,14 +40,14 @@
         dns_servers:
         - "{{ dns1 }}"
         runonce: 
-        - hostnamectl set-hostname "{{ vm_name }}.{{ domain }}"
+        - hostnamectl set-hostname "{{ vm_name }}"-"{{ uuid_list.stdout }}"."{{ domain }}"
       wait_for_ip_address: yes
     delegate_to: localhost
     register: deploy
 
   - name: Debugging instance info
     debug:
-      var: deploy.instance.hw_eth0.ipaddresses[0]
+      var: deploy.instance
 
   - name: add master server to inventory
     add_host:
