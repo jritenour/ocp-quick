@@ -1,0 +1,21 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  remote_user: root
+  vars:
+    type: node
+    master: false
+    node: true
+    ip_addr: "{{ node1 }}"
+  vars_files:
+    - '../main.yml'
+  roles:
+    - {role: 'ocp-vmware'}
+
+- hosts: all
+  remote_user: root
+  vars_files:
+    - '../main.yml'
+  roles:
+    - {role: 'jritenour.ocp-quick'}
