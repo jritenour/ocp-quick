@@ -13,9 +13,28 @@
   roles:
     - {role: 'ocp-vmware'}
 
+- hosts: masters
+  remote_user: root
+  vars_files:
+    - '../main.yml'
+  tasks:
+    - name: add newnodes line
+      lineinfile:
+        dest: /etc/ansible/hosts
+        state: present
+        insertafter: '^nodes'
+        line: 'new_nodes'
+
+    - name: add newnodes block
+      blockinfile:
+        insertafter: EOF
+        path: /etc/ansible/hosts
+        content: |
+          [new_nodes]
+          192.168.2.32  
 - hosts: all
   remote_user: root
   vars_files:
     - '../main.yml'
   roles:
-    - {role: 'jritenour.ocp-quick'}
+    - {role: 'ocp-scaleup'}
