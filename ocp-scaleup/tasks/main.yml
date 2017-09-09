@@ -27,6 +27,7 @@
     - ipa-client
   - name: configure IPA client
     command: ipa-client-install --server='{{ ipa_server }}' --domain='{{ domain }}' --hostname='{{ ansible_hostname }}'.'{{ domain }}' --principal='{{ ipa_user }}' --password='{{ ipa_password }}' --enable-dns-updates --unattended
+    ignore_errors: True
   - name: configure docker storage
     template:
       src: docker-storage-setup.j2
@@ -54,6 +55,6 @@
     when: "'master' in group_names"
   - name: Install OpenShift unattended
 #    command: atomic-openshift-installer -u -c ~/installer.cfg.yml install
-    command: ansible-playbook  -i /etc/ansible/hosts /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
+    command: ansible-playbook  -i /etc/ansible/hosts /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-node/scaleup.yml
     when: "'master' in group_names"
     ignore_errors: True
