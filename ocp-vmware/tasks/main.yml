@@ -1,7 +1,7 @@
 ---
 # tasks file for jritenour.vmware-cf-miq
 
-  - name: Generate
+  - name: Generate  UUID
     shell: openssl rand -hex 2
     register: uuid_list
   - name: Debugging instance info

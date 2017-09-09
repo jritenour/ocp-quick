@@ -1,5 +1,11 @@
 ---
 # tasks file for jritenour.vmware-cf-miq
+  - name: Generate UUID
+    shell: openssl rand -hex 2
+    register: uuid_list
+  - name: Debugging instance info
+    debug:
+      var: uuid_list.stdout
  - name: Authenticate to RHV-M
    ovirt_auth:
      url: "https://{{ rhvm_addr }}/ovirt-engine/api"
@@ -11,8 +17,10 @@
    ovirt_vms: 
      auth: "{{ ovirt_auth }}"
      state: running
-     name: "{{ vm_name }}"
+     name: "{{ vm_name }}-{{ uuid_list.stdout }}"
      cluster: "{{ cluster }}"
+     memory: 16GiB
+     cpu_sockets: 2
      wait: True
      template: "{{ template_name }}"
      nics:
@@ -39,9 +47,18 @@
      storage_domain: "{{ datastore }}" 
      
 
- - name: add host to inventory
-   add_host:
-     hostname: "{{ ipaddr }}"
-     ansible_user: root
-     ansible_ssh_pass: "{{ cf_ssh_pass }}"
-     groupname: cfdb
+  - name: add master server to inventory
+    add_host:
+      hostname: "{{ ip_addr }}"
+      ansible_ssh_user: root
+      ansible_ssh_pass: "{{ cf_ssh_pass }}"
+      groupname: master
+    when: master
+
+  - name: add nodes to inventory
+    add_host:
+      hostname: "{{ ip_addr }}"
+      ansible_ssh_user: root
+      ansible_ssh_pass: "{{ cf_ssh_pass }}"
+      groupname: node
+    when: node
