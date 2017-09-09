@@ -1,0 +1,47 @@
+---
+# tasks file for jritenour.vmware-cf-miq
+ - name: Authenticate to RHV-M
+   ovirt_auth:
+     url: "https://{{ rhvm_addr }}/ovirt-engine/api"
+     username: "{{ rhv_user }}"
+     password: "{{ rhv_pass }}" 
+     insecure: true
+
+ - name: create the VM
+   ovirt_vms: 
+     auth: "{{ ovirt_auth }}"
+     state: running
+     name: "{{ vm_name }}"
+     cluster: "{{ cluster }}"
+     wait: True
+     template: "{{ template_name }}"
+     nics:
+       - name: eth0
+         profile_name: "{{ network_name }}"
+         inferface: virtio 
+     cloud_init:
+       nic_boot_protocol: static
+       nic_ip_address: "{{ ipaddr }}"
+       nic_netmask: "{{ netmask }}"
+       nic_gateway: "{{ gateway }}"
+       nic_name: eth0
+       nic_on_boot: true 
+       dns_servers: "{{ dns }}"
+
+ - name: create the DB disk
+   ovirt_disks: 
+     auth: "{{ ovirt_auth }}"
+     name: "{{ db_vol_name }}"
+     interface: virtio
+     vm_name: "{{ vm_name }}"
+     size: "{{ db_size }}"GiB
+     format: cow
+     storage_domain: "{{ datastore }}" 
+     
+
+ - name: add host to inventory
+   add_host:
+     hostname: "{{ ipaddr }}"
+     ansible_user: root
+     ansible_ssh_pass: "{{ cf_ssh_pass }}"
+     groupname: cfdb
