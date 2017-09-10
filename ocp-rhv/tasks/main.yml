@@ -1,11 +1,11 @@
 ---
 # tasks file for jritenour.vmware-cf-miq
-  - name: Generate UUID
-    shell: openssl rand -hex 2
-    register: uuid_list
-  - name: Debugging instance info
-    debug:
-      var: uuid_list.stdout
+ - name: Generate UUID
+   shell: openssl rand -hex 2
+   register: uuid_list
+ - name: Debugging instance info
+   debug:
+     var: uuid_list.stdout
  - name: Authenticate to RHV-M
    ovirt_auth:
      url: "https://{{ rhvm_addr }}/ovirt-engine/api"
@@ -24,41 +24,57 @@
      wait: True
      template: "{{ template_name }}"
      nics:
-       - name: eth0
+       - name: nic1
          profile_name: "{{ network_name }}"
          inferface: virtio 
      cloud_init:
-       nic_boot_protocol: static
-       nic_ip_address: "{{ ipaddr }}"
-       nic_netmask: "{{ netmask }}"
-       nic_gateway: "{{ gateway }}"
-       nic_name: eth0
-       nic_on_boot: true 
+       host_name: "{{ vm_name }}-{{ uuid_list.stdout }}"
        dns_servers: "{{ dns }}"
+       custom_script: |
+         write_files:
+          - content: |
+              DEVICE=eth0
+              IPADDR="{{ ipaddr }}"
+              NETMASK="{{ netmask }}"
+              ONBOOT=yes
+              TYPE=Ethernet
+              USERCTL=no
+              NM_CONTROLLED=no
+              GATEWAY="{{ gateway }}"
+              DNS1="{{ dns }}"
+              DOMAIN="home.lab"
+            path: /etc/sysconfig/network-scripts/ifcfg-eth0
+            permissions: '0644'
 
  - name: create the DB disk
    ovirt_disks: 
      auth: "{{ ovirt_auth }}"
-     name: "{{ db_vol_name }}"
-     interface: virtio
-     vm_name: "{{ vm_name }}"
-     size: "{{ db_size }}"GiB
+     name: "{{ vm_name }}-{{ uuid_list.stdout }}-disk2"
+     interface: virtio_scsi
+     vm_name: "{{ vm_name }}-{{ uuid_list.stdout }}"
+     size: "{{ db_size }}GiB"
      format: cow
      storage_domain: "{{ datastore }}" 
-     
 
-  - name: add master server to inventory
-    add_host:
-      hostname: "{{ ip_addr }}"
-      ansible_ssh_user: root
-      ansible_ssh_pass: "{{ cf_ssh_pass }}"
-      groupname: master
-    when: master
 
-  - name: add nodes to inventory
-    add_host:
-      hostname: "{{ ip_addr }}"
-      ansible_ssh_user: root
-      ansible_ssh_pass: "{{ cf_ssh_pass }}"
-      groupname: node
-    when: node
+ - ovirt_vms_facts:
+     auth: "{{ ovirt_auth }}"
+     pattern: name=ocp-master* 
+ - debug:
+     var: ovirt_vms     
+
+ - name: add master server to inventory
+   add_host:
+     hostname: "{{ ipaddr }}"
+     ansible_ssh_user: root
+     ansible_ssh_pass: "{{ cf_ssh_pass }}"
+     groupname: master
+   when: master
+
+ - name: add nodes to inventory
+   add_host:
+     hostname: "{{ ipaddr }}"
+     ansible_ssh_user: root
+     ansible_ssh_pass: "{{ cf_ssh_pass }}"
+     groupname: node
+   when: node
