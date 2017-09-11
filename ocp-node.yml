@@ -20,7 +20,7 @@
         ansible_ssh_pass: "{{ cf_ssh_pass }}"
         groupname: master
 
-- hosts: masters
+- hosts: master
   remote_user: root
 #  vars_files:
 #    - '../main.yml'
