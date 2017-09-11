@@ -12,6 +12,13 @@
 #    - '../main.yml'
   roles:
     - {role: 'ocp-vmware'}
+  tasks: 
+    - name: add master server to inventory
+      add_host:
+        hostname: "{{ master1 }}"
+        ansible_ssh_user: root
+        ansible_ssh_pass: "{{ cf_ssh_pass }}"
+        groupname: master
 
 - hosts: masters
   remote_user: root
