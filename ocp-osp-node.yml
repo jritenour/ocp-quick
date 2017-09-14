@@ -15,7 +15,7 @@
     - name: add master server to inventory
       add_host:
         hostname: "{{ master1 }}"
-        ansible_ssh_user: ssh_user
+        ansible_ssh_user: "{{ ssh_user }}"
         groupname: master
 
 - hosts: master
