@@ -20,6 +20,8 @@
 
 - hosts: master
   remote_user: root
+  become: true
+
 #  vars_files:
 #    - '../main.yml'
   tasks:
