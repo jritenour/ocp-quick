@@ -38,7 +38,7 @@
         path: /etc/ansible/hosts
         content: |
           [new_nodes]
-          {{ osp_host.openstack.addresses.private[1].addr }}
+          "{{ hostvars[groups['node'][1]]['ansible_default_ipv4']['address'] }}"
 - hosts: all
   remote_user: root
 #  vars_files:
