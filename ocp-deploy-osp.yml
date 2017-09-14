@@ -1,0 +1,34 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  remote_user: root
+  vars_files:
+    - '../main.yml'
+  vars:
+    type: master
+    master: true
+    node: true
+  roles:
+    - {role: 'ocp-osp'}
+
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  remote_user: root
+  vars_files:
+    - '../main.yml'
+  vars:
+    type: node
+    master: false
+    node: true
+  roles:
+    - {role: 'ocp-osp'}
+
+- hosts: all
+  remote_user: cloud-user
+  become: true
+  vars_files:
+    - '../main.yml'
+  roles:
+    - {role: 'ocp-quick'}

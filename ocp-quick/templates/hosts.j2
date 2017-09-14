@@ -6,10 +6,10 @@ nodes
 # Set variables common for all OSEv3 hosts
 [OSEv3:vars]
 # SSH user, this user should allow ssh based auth without requiring a password
-ansible_ssh_user=root
+ansible_ssh_user={{ ssh_user }}
 
 # If ansible_ssh_user is not root, ansible_become must be set to true
-#ansible_become=true
+ansible_become=true
 
 openshift_deployment_type=openshift-enterprise
 
@@ -18,9 +18,9 @@ openshift_deployment_type=openshift-enterprise
 
 # host group for masters
 [masters]
-192.168.2.30
+{{ hostvars[groups['master'][0]]['ansible_default_ipv4']['address'] }}
 
 # host group for nodes, includes region info
 [nodes]
-192.168.2.30
-192.168.2.31 openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
+{{ hostvars[groups['master'][0]]['ansible_default_ipv4']['address'] }}
+{{ hostvars[groups['node'][1]]['ansible_default_ipv4']['address'] }}  openshift_node_labels="{'region': 'infra', 'zone': 'default'}"

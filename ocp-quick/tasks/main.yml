@@ -34,6 +34,8 @@
       owner: root
       group: root
       mode: 0644
+  - name: run docker storage setup
+    command: docker-storage-setup
   - name: start and enable Docker
     service:
       name: docker
