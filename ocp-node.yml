@@ -38,7 +38,7 @@
         path: /etc/ansible/hosts
         content: |
           [new_nodes]
-          192.168.2.32  
+          192.168.2.33 
 - hosts: all
   remote_user: root
 #  vars_files:
