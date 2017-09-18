@@ -25,7 +25,7 @@
         type: thin
         datastore: "{{ vc_datastore }}"
       hardware:
-        memory_mb: 16384
+        memory_mb: 8192
         num_cpus: 2
       template: "{{ template_name }}"
       networks:
