@@ -24,10 +24,10 @@
     - psacct
     - atomic-openshift-utils
     - docker-1.12.6
-    - ipa-client
-  - name: configure IPA client
-    command: ipa-client-install --server='{{ ipa_server }}' --domain='{{ domain }}' --hostname='{{ ansible_hostname }}'.'{{ domain }}' --principal='{{ ipa_user }}' --password='{{ ipa_password }}' --enable-dns-updates --unattended
-    ignore_errors: True
+#    - ipa-client
+#  - name: configure IPA client
+#    command: ipa-client-install --server='{{ ipa_server }}' --domain='{{ domain }}' --hostname='{{ ansible_hostname }}'.'{{ domain }}' --principal='{{ ipa_user }}' --password='{{ ipa_password }}' --enable-dns-updates --unattended
+#    ignore_errors: True
   - name: configure docker storage
     template:
       src: docker-storage-setup.j2
