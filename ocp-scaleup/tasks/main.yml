@@ -27,7 +27,7 @@
     - ipa-client
   - name: configure IPA client
     command: ipa-client-install --server='{{ ipa_server }}' --domain='{{ domain }}' --hostname='{{ ansible_hostname }}'.'{{ domain }}' --principal='{{ ipa_user }}' --password='{{ ipa_password }}' --enable-dns-updates --unattended
-    when: "'node'" in group_names"
+    when: "'node' in group_names"
     ignore_errors: True
   - name: configure docker storage
     template:
