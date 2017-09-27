@@ -38,7 +38,7 @@
         path: /etc/ansible/hosts
         content: |
           [new_nodes]
-          {{ hostvars[groups['node'][0]]['ansible_default_ipv4']['address'] }}
+          {{ hostvars[groups['node'][0]]['ansible_fqdn'] }}
 - hosts: all
   remote_user: cloud-user
   become: true

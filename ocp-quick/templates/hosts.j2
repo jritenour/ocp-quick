@@ -22,5 +22,5 @@ openshift_deployment_type=openshift-enterprise
 
 # host group for nodes, includes region info
 [nodes]
-{{ hostvars[groups['master'][0]]['ansible_hostname'] }}
-{{ hostvars[groups['node'][1]]['ansible_hostname'] }}  openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
+{{ hostvars[groups['master'][0]]['ansible_fqdn'] }}
+{{ hostvars[groups['node'][1]]['ansible_fqdn'] }}  openshift_node_labels="{'region': 'infra', 'zone': 'default'}"

@@ -40,11 +40,6 @@
       name: docker
       state: started
       enabled: true
-#  - name: Copy installer config
-#    copy:
-#      src: files/installer.cfg.yml
-#      dest: /root/installer.cfg.yml
-#    when: "'master' in group_names"
   - name: Add node to cluster
     command: ansible-playbook  -i /etc/ansible/hosts /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-node/scaleup.yml
     when: "'master' in group_names"
