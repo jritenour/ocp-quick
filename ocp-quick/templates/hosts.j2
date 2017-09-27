@@ -18,9 +18,9 @@ openshift_deployment_type=openshift-enterprise
 
 # host group for masters
 [masters]
-{{ hostvars[groups['master'][0]]['ansible_default_ipv4']['address'] }}
+{{ hostvars[groups['master'][0]]['ansible_hostname'] }}
 
 # host group for nodes, includes region info
 [nodes]
-{{ hostvars[groups['master'][0]]['ansible_default_ipv4']['address'] }}
-{{ hostvars[groups['node'][1]]['ansible_default_ipv4']['address'] }}  openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
+{{ hostvars[groups['master'][0]]['ansible_hostname'] }}
+{{ hostvars[groups['node'][1]]['ansible_hostname'] }}  openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
