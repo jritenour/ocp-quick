@@ -6,9 +6,9 @@
   - name: Register with Red Hat Subscription Manager
     redhat_subscription: 
       state: present
-      username: {{ rhn_user }}
-      password: {{ rhn_pass }}
-      pool_ids: {{ rhn_pool }}
+      username: '{{ rhn_user }}'
+      password: '{{ rhn_pass }}'
+      pool_ids: '{{ rhn_pool }}'
   - name: Disable all repos
     command: subscription-manager repos --disable "*"
   - name: Enable necessary repos
@@ -47,11 +47,6 @@
       name: docker
       state: started
       enabled: true
-#  - name: Copy installer config
-#    copy:
-#      src: files/installer.cfg.yml
-#      dest: /root/installer.cfg.yml
-#    when: "'master' in group_names"
   - name: Copy hoststemplate file
     template:
       src: hosts.j2
@@ -61,7 +56,6 @@
       mode: 0644
     when: "'master' in group_names"
   - name: Install OpenShift unattended
-#    command: atomic-openshift-installer -u -c ~/installer.cfg.yml install
     command: ansible-playbook  -i /etc/ansible/hosts /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
     when: "'master' in group_names"
     ignore_errors: True
