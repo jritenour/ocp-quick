@@ -43,7 +43,6 @@
     wait_for:
      host: "{{ osp_host.openstack.addresses.private[1].addr }}"
      port: "22"
-     delay: "60"
      timeout: "320"
      state: "started"
 
