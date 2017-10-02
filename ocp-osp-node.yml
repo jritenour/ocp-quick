@@ -18,7 +18,9 @@
         ansible_ssh_user: "{{ ssh_user }}"
         groupname: master
 
-- hosts:!localhost
+- hosts:
+    - master
+    - node
   remote_user: root
   become: true
 
