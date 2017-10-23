@@ -41,21 +41,21 @@
 
   - name: wait for instance become ready to use
     wait_for:
-     host: "{{ osp_host.openstack.addresses.private[1].addr }}"
+     host: "{{ osp_host.openstack.public_v4 }}"
      port: "22"
      timeout: "320"
      state: "started"
 
   - name: add master server to inventory
     add_host:
-      hostname: "{{ osp_host.openstack.addresses.private[1].addr }}"
+      hostname: "{{ osp_host.openstack.public_v4 }}"
       ansible_ssh_user: cloud-user
       groupname: master
     when: master
 
   - name: add Worker to inventory
     add_host:
-      hostname: "{{ osp_host.openstack.addresses.private[1].addr }}"
+      hostname: "{{ osp_host.openstack.public_v4 }}"
       ansible_ssh_user: cloud-user
       groupname: node
     when: node
