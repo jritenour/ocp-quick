@@ -40,8 +40,8 @@
         path: /etc/ansible/hosts
         content: |
           [new_nodes]
-          {{ hostvars[groups['node'][0]]['ansible_fqdn'] }}
-- hosts: all
+          {{ hostvars[groups['node'][0]]['ansible_default_ipv4']['address'] }}
+- hosts: '!localhost'
   remote_user: cloud-user
   become: true
 #  vars_files:
