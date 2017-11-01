@@ -52,6 +52,8 @@
   - name: create ssh key on root account
     shell: 'ssh-keygen -b 2048 -t rsa -f /root/.ssh/id_rsa -q -N ""'
     when: "'master' in group_names"
+# Placholder = "cat /path/to/id_rsa.pub >> /root/.ssh/authorized_keys" 
+# Need to save stdout of cat id_rsa.pub to a var, then write that to authorized keys on all hosts - will implement/test later.  Also need to add to scaleup
   - name: copy key to localhosts
     shell: 'sshpass -p {{ ssh_pass }} ssh-copy-id root@localhost'
   - name: Install OpenShift unattended
