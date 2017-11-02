@@ -30,12 +30,9 @@
       template: "{{ template_name }}"
       networks:
       - name: VM Network
-        ip: "{{ ip_addr }}"
-        netmask: "{{ mask }}"
-        gateway: "{{ gateway }}"
-        domain: "{{ domain }}"
         dns_servers:
         - "{{ dns1 }}"
+        type: dhcp
       customization:
         dns_servers:
         - "{{ dns1 }}"
@@ -47,11 +44,11 @@
 
   - name: Debugging instance info
     debug:
-      var: deploy.instance
+      var: deploy.instance.hw_eth0.ipaddresses[0]
 
   - name: add master server to inventory
     add_host:
-      hostname: "{{ ip_addr }}"
+      hostname: "{{ deploy.instance.hw_eth0.ipaddresses[0] }}"
       ansible_ssh_user: root
       ansible_ssh_pass: "{{ cf_ssh_pass }}"
       groupname: master
@@ -59,7 +56,7 @@
 
   - name: add nodes to inventory
     add_host:
-      hostname: "{{ ip_addr }}"
+      hostname: "{{ deploy.instance.hw_eth0.ipaddresses[0] }}"
       ansible_ssh_user: root
       ansible_ssh_pass: "{{ cf_ssh_pass }}"
       groupname: node

@@ -9,7 +9,6 @@
     type: master
     master: true
     node: true
-    ip_addr: "{{ master1 }}"
   roles:
     - {role: 'ocp-vmware'}
 
@@ -21,7 +20,6 @@
     type: node
     master: false
     node: true
-    ip_addr: "{{ node1 }}"
   vars_files:
     - '../main.yml'
   roles:
