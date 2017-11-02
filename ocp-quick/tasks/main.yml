@@ -54,16 +54,20 @@
     when: "'master' in group_names" 
   - name: capture master public key
     shell: "cat {{ ansible_user_dir }}/.ssh/id_rsa.pub" 
+    when: "'master' in group_names"
     register: pubkey
     when: "'master' in group_names"
   - debug: 
       var: pubkey.stdout_lines
   - name: set the pubkey fact on the master
     set_fact:
-      masterpubkey: "{{ pubkey.stdout_lines }}"
+      masterpubkey: "{{ pubkey.stdout }}"
     when: "'master' in group_names"
-  - name: copy key to localhosts
-    shell 'cat "{{ hostvars[groups['master'][0]]['masterpubkey']  }}" >> "{{ ansible_user_dir }}"/.ssh/authorized_keys'
+  - name: add key to authorized keys
+    authorized_key: 
+      user: "{{ ssh_user }}"
+      state: present
+      key: "{{ hostvars[groups['master'][0]]['masterpubkey']  }}"
   - name: Install OpenShift unattended
     command: ansible-playbook  -i /etc/ansible/hosts -e 'host_key_checking=False' /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
     when: "'master' in group_names"
