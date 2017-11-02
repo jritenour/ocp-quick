@@ -50,25 +50,21 @@
       mode: 0644
     when: "'master' in group_names"
   - name: create ssh key on root account
-    shell: 'ssh-keygen -b 2048 -t rsa -f /root/.ssh/id_rsa -q -N ""'
+    shell: 'ssh-keygen -b 2048 -t rsa -f {{ ansible_user_dir }}/.ssh/id_rsa -q -N ""'
     when: "'master' in group_names" 
   - name: capture master public key
-    shell: "cat /{{ ssh_user }}/.ssh/id_rsa.pub" 
+    shell: "cat {{ ansible_user_dir }}/.ssh/id_rsa.pub" 
     register: pubkey
     when: "'master' in group_names"
   - debug: 
-      var: pubkey
+      var: pubkey.stdout_lines
+  - name: set the pubkey fact on the master
+    set_fact:
+      masterpubkey: "{{ pubkey.stdout_lines }}"
+    when: "'master' in group_names"
   - name: copy key to localhosts
-    lineinfile: 
-      dest: /{{ ssh_user }}/.ssh/authorized_keys
-      state: present
-      create: yes
-      line: "{{ pubkey.stdout }}"
-      owner: "{{ ssh_user }}"
-      group: "{{ ssh_user }}"
-      mode: 0600
-#    shell: 'sshpass -p {{ cf_ssh_pass }} ssh-copy-id root@localhost'
+    shell 'cat "{{ hostvars[groups['master'][0]]['masterpubkey']  }}" >> "{{ ansible_user_dir }}"/.ssh/authorized_keys'
   - name: Install OpenShift unattended
-    command: ansible-playbook  -i /etc/ansible/hosts -e 'host_key_checking=False'/usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
+    command: ansible-playbook  -i /etc/ansible/hosts -e 'host_key_checking=False' /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
     when: "'master' in group_names"
     ignore_errors: True
