@@ -37,18 +37,16 @@
  - name: List vms
    ovirt_vms_facts:
      auth: "{{ ovirt_auth }}"
-     pattern: name=ocpmaster*
+     pattern: name=ocp*
    when: master
- - debug:
-     var: ovirt_vms
 
- - name: List vms
-   ovirt_vms_facts:
-     auth: "{{ ovirt_auth }}"
-     pattern: name=ocpnode*
- - debug:
-     var: ovirt_vms.results
-   when: node
+# - name: List vms
+#   ovirt_vms_facts:
+#     auth: "{{ ovirt_auth }}"
+#     pattern: name=ocpnode*
+# - debug:
+#     var: ovirt_vms
+#   when: node
 
  - name: Get VM API info
    uri:
@@ -61,18 +59,19 @@
      body_format: raw
      headers:
        Accept: application/json
-   with_items: ovirt_vms.results
+   with_items: "{{ ovirt_vms }}"
    register: vmapi
     
  - debug:
-     var: vmapi.json.reported_device[0]
+     var: vmapi.results[0].json
 
  - name: add master server to inventory
    add_host:
-     hostname: "{{ vmapi.json.reported_device[0].ips.ip[0].address }}"
+     hostname: "{{ item.json.reported_device[0].ips.ip[0].address }}"
      ansible_ssh_user: root
      ansible_ssh_pass: "{{ cf_ssh_pass }}"
      groupname: master
+   with_items: vmapi.results
    when: master
 
  - name: add nodes to inventory
