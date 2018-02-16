@@ -37,15 +37,13 @@
  - name: List vms
    ovirt_vms_facts:
      auth: "{{ ovirt_auth }}"
-     pattern: name=ocp*
+     pattern: name=ocpmaster*
    when: master
 
  - name: List vms
    ovirt_vms_facts:
      auth: "{{ ovirt_auth }}"
      pattern: name=ocp*
- - debug:
-     var: ovirt_vms
    when: node
 
  - name: Get VM API info
@@ -61,9 +59,7 @@
        Accept: application/json
    with_items: "{{ ovirt_vms }}"
    register: vmapi
-    
- - debug:
-     var: vmapi.results[0].json
+   when: master
 
  - name: add master server to inventory
    add_host:
@@ -73,6 +69,27 @@
      groupname: master
    with_items: "{{ vmapi.results }}"
    when: master
+
+ - name: List vms
+   ovirt_vms_facts:
+     auth: "{{ ovirt_auth }}"
+     pattern: name=ocp*
+   when: node
+
+ - name: Get VM API info
+   uri:
+     url: "https://{{ rhvm_addr }}{{ item.href }}/reporteddevices"
+     method: GET
+     return_content: yes
+     user: "{{ rhv_user }}"
+     password: "{{ rhv_pass }}"
+     validate_certs: no
+     body_format: raw
+     headers:
+       Accept: application/json
+   with_items: "{{ ovirt_vms }}"
+   register: vmapi
+   when: node
 
  - name: add nodes to inventory
    add_host:

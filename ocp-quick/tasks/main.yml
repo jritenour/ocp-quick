@@ -1,14 +1,11 @@
 ---
   - name: Register with Red Hat Subscription Manager
-    command: subscription-manager register --username={{ rhn_user }} --password={{ rhn_pass }} --force
-
-    - name: Register with Red Hat Subscription Manager
-      redhat_subscription:
-        state: present
-        username: "{{ rhn_user }}"
-        password: "{{ rhn_pass }}"
-        pool_ids:
-          - "{{ rhn_pool }}"
+    redhat_subscription:
+      state: present
+      username: "{{ rhn_user }}"
+      password: "{{ rhn_pass }}"
+      pool_ids:
+        - "{{ rhn_pool }}"
 
   - name: Disable all repos
     command: subscription-manager repos --disable "*"
