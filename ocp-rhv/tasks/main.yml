@@ -1,8 +1,5 @@
 ---
 # tasks file for jritenour.vmware-cf-miq
- - name: Generate UUID
-   shell: openssl rand -hex 2
-   register: uuid_list
  - name: Authenticate to RHV-M
    ovirt_auth:
      url: "https://{{ rhvm_addr }}/ovirt-engine/api"
@@ -39,26 +36,40 @@
 
  - name: List vms
    ovirt_vms_facts:
-     fetch_nested: true
-     nested_attributes:
-       - description
      auth: "{{ ovirt_auth }}"
-
- - ovirt_nics_facts:
-     auth: "{{ ovirt_auth }}"
-     vm: "{{ item }}"
-     name: eth*
-     fetch_nested: true
-     nested_attributes:
-       - description
-   with_items: "{{ vm_list }}" 
-
+     pattern: name=ocpmaster*
+   when: master
  - debug:
-     var: ovirt_nics 
+     var: ovirt_vms
+
+ - name: List vms
+   ovirt_vms_facts:
+     auth: "{{ ovirt_auth }}"
+     pattern: name=ocpnode*
+ - debug:
+     var: ovirt_vms.results
+   when: node
+
+ - name: Get VM API info
+   uri:
+     url: "https://{{ rhvm_addr }}{{ item.href }}/reporteddevices"
+     method: GET
+     return_content: yes
+     user: "{{ rhv_user }}"
+     password: "{{ rhv_pass }}"
+     validate_certs: no
+     body_format: raw
+     headers:
+       Accept: application/json
+   with_items: ovirt_vms.results
+   register: vmapi
+    
+ - debug:
+     var: vmapi.json.reported_device[0]
 
  - name: add master server to inventory
    add_host:
-     hostname: "{{ ipaddr }}"
+     hostname: "{{ vmapi.json.reported_device[0].ips.ip[0].address }}"
      ansible_ssh_user: root
      ansible_ssh_pass: "{{ cf_ssh_pass }}"
      groupname: master
@@ -66,7 +77,7 @@
 
  - name: add nodes to inventory
    add_host:
-     hostname: "{{ ipaddr }}"
+     hostname: "{{ vmapi.json.reported_device[0].ips.ip[0].address }}"
      ansible_ssh_user: root
      ansible_ssh_pass: "{{ cf_ssh_pass }}"
      groupname: node
