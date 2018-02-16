@@ -22,9 +22,7 @@
     type: node
     master: false
     node: true
-    vm_list:
-      - ocpnode1
-      - ocpnode2 
+    vm_list: "{{ node_list }}"
   vars_files:
     - '../main.yml'
   roles:

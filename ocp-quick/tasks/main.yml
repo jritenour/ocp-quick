@@ -2,8 +2,13 @@
   - name: Register with Red Hat Subscription Manager
     command: subscription-manager register --username={{ rhn_user }} --password={{ rhn_pass }} --force
 
-  - name: Attach subscription
-    command: subscription-manager attach --pool="{{ rhn_pool }}"
+    - name: Register with Red Hat Subscription Manager
+      redhat_subscription:
+        state: present
+        username: "{{ rhn_user }}"
+        password: "{{ rhn_pass }}"
+        pool_ids:
+          - "{{ rhn_pool }}"
 
   - name: Disable all repos
     command: subscription-manager repos --disable "*"
@@ -31,8 +36,8 @@
     - ipa-client
     - httpd-tools
 
-  - name: configure IPA client
-    command: ipa-client-install --server='{{ ipa_server }}' --domain='{{ domain }}' --hostname='{{ ansible_hostname }}'.'{{ domain }}' --principal='{{ ipa_user }}' --password='{{ ipa_password }}' --enable-dns-updates --unattended
+#  - name: configure IPA client
+#    command: ipa-client-install --server='{{ ipa_server }}' --domain='{{ domain }}' --hostname='{{ ansible_hostname }}'.'{{ domain }}' --principal='{{ ipa_user }}' --password='{{ ipa_password }}' --enable-dns-updates --unattended
 
   - name: configure docker storage
     template:
@@ -109,4 +114,5 @@
 #      zone: "{{ domain }}"
 #      record: "{{ ansible_hostname }}"
 #      value: "{{ hostvars[groups['node'][1]]['ansible_default_ipv4']['address'] }}"
+
 
