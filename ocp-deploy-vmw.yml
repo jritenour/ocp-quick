@@ -8,7 +8,25 @@
   vars:
     type: master
     master: true
+    infra: false
     node: true
+    count: 1
+  roles:
+    - {role: 'ocp-vmware'}
+
+
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  remote_user: root
+  vars:
+    type: infra
+    master: false
+    infra: true
+    node: true
+    count: 1
+  vars_files:
+    - '../main.yml'
   roles:
     - {role: 'ocp-vmware'}
 
@@ -19,7 +37,9 @@
   vars:
     type: node
     master: false
+    infra: false
     node: true
+    count: 2
   vars_files:
     - '../main.yml'
   roles:

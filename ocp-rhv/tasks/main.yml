@@ -3,9 +3,6 @@
  - name: Generate UUID
    shell: openssl rand -hex 2
    register: uuid_list
- - name: Debugging instance info
-   debug:
-     var: uuid_list.stdout
  - name: Authenticate to RHV-M
    ovirt_auth:
      url: "https://{{ rhvm_addr }}/ovirt-engine/api"
@@ -17,51 +14,47 @@
    ovirt_vms: 
      auth: "{{ ovirt_auth }}"
      state: running
-     name: "{{ vm_name }}-{{ uuid_list.stdout }}"
+     name: "{{ item }}"
      cluster: "{{ cluster }}"
      memory: 16GiB
      cpu_sockets: 2
      wait: True
      template: "{{ template_name }}"
      nics:
-       - name: nic1
+       - name: eth0
          profile_name: "{{ network_name }}"
-         inferface: virtio 
-     cloud_init:
-       host_name: "{{ vm_name }}-{{ uuid_list.stdout }}"
-       dns_servers: "{{ dns }}"
-       custom_script: |
-         write_files:
-          - content: |
-              DEVICE=eth0
-              IPADDR="{{ ipaddr }}"
-              NETMASK="{{ netmask }}"
-              ONBOOT=yes
-              TYPE=Ethernet
-              USERCTL=no
-              NM_CONTROLLED=no
-              GATEWAY="{{ gateway }}"
-              DNS1="{{ dns }}"
-              DOMAIN="home.lab"
-            path: /etc/sysconfig/network-scripts/ifcfg-eth0
-            permissions: '0644'
+         inferface: virtio
+   with_items: "{{ vm_list }}"
 
  - name: create the DB disk
    ovirt_disks: 
      auth: "{{ ovirt_auth }}"
-     name: "{{ vm_name }}-{{ uuid_list.stdout }}-disk2"
+     name: "{{ item }}-disk2"
      interface: virtio_scsi
-     vm_name: "{{ vm_name }}-{{ uuid_list.stdout }}"
+     vm_name: "{{ item }}"
      size: "{{ db_size }}GiB"
      format: cow
      storage_domain: "{{ datastore }}" 
+   with_items: "{{ vm_list }}"
 
-
- - ovirt_vms_facts:
+ - name: List vms
+   ovirt_vms_facts:
+     fetch_nested: true
+     nested_attributes:
+       - description
      auth: "{{ ovirt_auth }}"
-     pattern: name=ocp-master* 
+
+ - ovirt_nics_facts:
+     auth: "{{ ovirt_auth }}"
+     vm: "{{ item }}"
+     name: eth*
+     fetch_nested: true
+     nested_attributes:
+       - description
+   with_items: "{{ vm_list }}" 
+
  - debug:
-     var: ovirt_vms     
+     var: ovirt_nics 
 
  - name: add master server to inventory
    add_host:

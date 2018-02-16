@@ -9,7 +9,8 @@
     type: master
     master: true
     node: true
-    ipaddr: "{{ master1 }}"
+    vm_list: 
+      - ocpmaster1
   roles:
     - {role: 'ocp-rhv'}
 
@@ -21,7 +22,9 @@
     type: node
     master: false
     node: true
-    ipaddr: "{{ node1 }}"
+    vm_list:
+      - ocpnode1
+      - ocpnode2 
   vars_files:
     - '../main.yml'
   roles:

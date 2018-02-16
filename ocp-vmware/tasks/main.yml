@@ -4,9 +4,7 @@
   - name: Generate  UUID
     shell: openssl rand -hex 2
     register: uuid_list
-  - name: Debugging instance info
-    debug:
-      var: uuid_list.stdout
+    with_sequence: start=1 end="{{ count }}"
   - name: create the VM
     vmware_guest:
       hostname: "{{ vcenter_ip }}"
@@ -15,7 +13,7 @@
       validate_certs: no
       esxi_hostname: "{{ esx_host }}"
       datacenter: "{{ vc_datacenter }}"
-      name: "{{ vm_name }}-{{ uuid_list.stdout }}"
+      name: "{{ vm_name }}-{{ item.stdout }}"
       state: poweredon
       disk:
       - size_gb: 60
@@ -37,26 +35,34 @@
         dns_servers:
         - "{{ dns1 }}"
         runonce: 
-        - hostnamectl set-hostname "{{ vm_name }}"-"{{ uuid_list.stdout }}"."{{ domain }}"
+        - hostnamectl set-hostname "{{ vm_name }}"-"{{ item.stdout }}"."{{ domain }}"
       wait_for_ip_address: yes
     delegate_to: localhost
     register: deploy
+    with_items: "{{ uuid_list.results }}"
 
   - name: Debugging instance info
-    debug:
-      var: deploy.instance.hw_eth0.ipaddresses[0]
+    debug: var=deploy.results[0]
 
   - name: add master server to inventory
     add_host:
-      hostname: "{{ deploy.instance.hw_eth0.ipaddresses[0] }}"
+      hostname: "{{ deploy.results.instance.hw_eth0.ipaddresses[0] }}"
       ansible_ssh_user: root
       ansible_ssh_pass: "{{ cf_ssh_pass }}"
       groupname: master
     when: master
 
+  - name: add infra nodes to inventory
+    add_host:
+      hostname: "{{ deploy.results.instance.hw_eth0.ipaddresses[0] }}"
+      ansible_ssh_user: root
+      ansible_ssh_pass: "{{ cf_ssh_pass }}"
+      groupname: node
+    when: infra
+
   - name: add nodes to inventory
     add_host:
-      hostname: "{{ deploy.instance.hw_eth0.ipaddresses[0] }}"
+      hostname: "{{ deploy.results.instance.hw_eth0.ipaddresses[0] }}"
       ansible_ssh_user: root
       ansible_ssh_pass: "{{ cf_ssh_pass }}"
       groupname: node
