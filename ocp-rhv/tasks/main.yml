@@ -13,8 +13,8 @@
      state: running
      name: "{{ item }}"
      cluster: "{{ cluster }}"
-     memory: 16GiB
-     cpu_sockets: 2
+     memory: "{{ mem_gb }}"GiB
+     cpu_sockets: "{{ cpus }}"
      wait: True
      template: "{{ template_name }}"
      nics:
@@ -39,12 +39,6 @@
      auth: "{{ ovirt_auth }}"
      pattern: name=ocpmaster*
    when: master
-
- - name: List vms
-   ovirt_vms_facts:
-     auth: "{{ ovirt_auth }}"
-     pattern: name=ocp*
-   when: node
 
  - name: Get VM API info
    uri:
