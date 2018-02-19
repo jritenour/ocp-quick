@@ -71,8 +71,8 @@
     when: "'master' in group_names"
     register: pubkey
 
-  - debug: 
-      var: pubkey.stdout_lines
+#  - debug: 
+#      var: pubkey.stdout_lines
 
   - name: set the pubkey fact on the master
     set_fact:

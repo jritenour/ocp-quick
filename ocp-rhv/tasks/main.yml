@@ -13,7 +13,7 @@
      state: running
      name: "{{ item }}"
      cluster: "{{ cluster }}"
-     memory: "{{ mem_gb }}"GiB
+     memory: "{{ mem_gb }}GiB"
      cpu_sockets: "{{ cpus }}"
      wait: True
      template: "{{ template_name }}"

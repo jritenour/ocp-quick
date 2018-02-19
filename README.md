@@ -1,3 +1,12 @@
+NOTE: Full documentation is coming soon (by end of February 2018)
+
+There a couple main use cases here:
+
+- Building a new OpenShift cluster on on-premise infrastructure (RHV, VMware & OpenStack)
+- Adding new application nodes to existing infrastructure
+
+I may explore doing stuff with EC2, Azure and other cloud providers, but I feel like that is mostly well-handled out of the box with OpenShift. 
+
 | Variable Name | Usage                                                                                                         | Example       |
 |---------------|---------------------------------------------------------------------------------------------------------------|---------------|
 |		| General variables												|		|
