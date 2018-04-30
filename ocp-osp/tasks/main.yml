@@ -1,13 +1,13 @@
 ---
-# tasks file for jritenour.osp-cf-miq
-  - name: Generate  UUID
-    shell: openssl rand -hex 2
-    register: uuid_list
-  - name: Debugging instance info
-    debug:
-      var: uuid_list.stdout
+# tasks file for jritenour.ocp-osp
+#  - name: Generate  UUID
+#    shell: openssl rand -hex 2
+#    register: uuid_list
+#  - name: Debugging instance info
+#    debug:
+#      var: uuid_list.stdout
 
-  - name: Create CFME volume for instance
+  - name: Create volume for /var for all instances
     os_volume:
       auth:
         auth_url: "{{ osp_url }}"
@@ -17,7 +17,9 @@
       state: present
       availability_zone: "{{ az }}"
       size: "{{ db_size }}"
-      display_name: "{{ db_vol_name }}-{{ uuid_list.stdout }}"
+      display_name: "{{ db_vol_name }}-{{ item }}"
+    with_sequence:
+      count={{ num }}
 
   - name: launch instances
     os_server:
@@ -34,28 +36,32 @@
         - net-name: "{{ network_name }}"
       image: "{{ image_uid }}"
       flavor: "{{ flavor_name }}"
+      security_groups: "{{ security_group }}"
+      auto_ip: yes
       volumes:
-        - "{{ db_vol_name }}-{{ uuid_list.stdout }}"
+        - "{{ db_vol_name }}-{{ num }}"
     register: osp_host
 
 
-  - name: wait for instance become ready to use
-    wait_for:
-     host: "{{ osp_host.openstack.public_v4 }}"
-     port: "22"
-     timeout: "320"
-     state: "started"
+#  - name: wait for instances become ready to use
+#    wait_for:
+#     host: "{{ osp_host.openstack.public_v4 }}"
+#     port: "22"
+#     timeout: "320"
+#     state: "started"
 
   - name: add master server to inventory
     add_host:
-      hostname: "{{ osp_host.openstack.public_v4 }}"
+      hostname: "{{ item.accessIPv4 }}"
       ansible_ssh_user: cloud-user
       groupname: master
+    with_items: "{{ openstack_servers }}"
     when: master
 
   - name: add Worker to inventory
     add_host:
-      hostname: "{{ osp_host.openstack.public_v4 }}"
+      hostname: "{{ item.accessIPv4 }}"
       ansible_ssh_user: cloud-user
       groupname: node
+    with_items: "{{ openstack_servers }}"
     when: node

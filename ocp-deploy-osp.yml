@@ -22,6 +22,7 @@
     type: node
     master: false
     node: true
+    num: 2
   roles:
     - {role: 'ocp-osp'}
 
