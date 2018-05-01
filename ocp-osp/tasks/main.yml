@@ -39,7 +39,7 @@
       security_groups: "{{ security_group }}"
       auto_ip: yes
       volumes:
-        - "{{ db_vol_name }}-{{ num }}"
+        - "{{ db_vol_name }}-{{ item }}"
     register: osp_host
     with_sequence:
       count={{ num }}
@@ -63,7 +63,6 @@
       groupname: master
     when: master
 
-
   - name: add nodes to inventory
     add_host:
       hostname: "{{ item.openstack.public_v4 }}"
@@ -71,3 +70,7 @@
       groupname: node
     with_items: "{{ osp_host.results }}"
     when: node
+
+  - name: Pause playbook execution for 30 seconds
+    pause:
+      seconds: 30

@@ -11,7 +11,7 @@
     command: subscription-manager repos --disable "*"
 
   - name: Enable necessary repos
-    command: subscription-manager repos --enable="rhel-7-server-rpms"     --enable="rhel-7-server-extras-rpms"     --enable="rhel-7-server-ose-3.9-rpms"     --enable="rhel-7-fast-datapath-rpms --enable="rhel-7-server-ansible-2.4-rpms"
+    command: subscription-manager repos --enable="rhel-7-server-rpms"     --enable="rhel-7-server-extras-rpms"     --enable="rhel-7-server-ose-3.9-rpms"     --enable="rhel-7-fast-datapath-rpms" --enable="rhel-7-server-ansible-2.4-rpms"
 
   - name: Install necessary packages
     yum:  
@@ -34,7 +34,7 @@
     - httpd-tools
 
   - name: configure IPA client
-    command: ipa-client-install --server='{{ ipa_server }}' --domain='{{ domain }}' --hostname='{{ ansible_hostname }}'.'{{ domain }}' --principal='{{ ipa_user }}' --password='{{ ipa_password }}' --enable-dns-updates --unattended
+    command: ipa-client-install --server='{{ ipa_server }}' --domain='{{ domain }}' --hostname='{{ ansible_hostname }}'.'{{ domain }}' --principal='{{ ipa_user }}' --password='{{ ipa_password }}' --enable-dns-updates --unattended --force-join
 
   - name: configure docker storage
     template:
@@ -79,14 +79,34 @@
       masterpubkey: "{{ pubkey.stdout }}"
     when: "'master' in group_names"
 
+  - name: restart dbus
+    service:
+      name: dbus
+      state: restarted
+    when: "'master' in group_names"
+ 
+  - name: Set domain in resolve search list
+    lineinfile:
+      path: /etc/resolv.conf
+      regexp: '^search'
+      line: 'search {{ domain }}'
+      owner: root
+      group: root
+      mode: 0644
+
   - name: add key to authorized keys
     authorized_key: 
       user: "{{ ssh_user }}"
       state: present
       key: "{{ hostvars[groups['master'][0]]['masterpubkey']  }}"
 
-  - name: Install OpenShift unattended
-    command: ansible-playbook  -i /etc/ansible/hosts -e 'host_key_checking=False' /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
+  - name: Run prereqs playbook
+    command: ansible-playbook  -i /etc/ansible/hosts -e 'host_key_checking=False' /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
+    when: "'master' in group_names"
+    ignore_errors: True
+
+  - name: Run deploy_cluster playbook
+    command: ansible-playbook  -i /etc/ansible/hosts -e 'host_key_checking=False' /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
     when: "'master' in group_names"
     ignore_errors: True
 
