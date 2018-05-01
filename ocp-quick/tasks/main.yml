@@ -11,7 +11,7 @@
     command: subscription-manager repos --disable "*"
 
   - name: Enable necessary repos
-    command: subscription-manager repos --enable="rhel-7-server-rpms"     --enable="rhel-7-server-extras-rpms"     --enable="rhel-7-server-ose-3.6-rpms"     --enable="rhel-7-fast-datapath-rpms"
+    command: subscription-manager repos --enable="rhel-7-server-rpms"     --enable="rhel-7-server-extras-rpms"     --enable="rhel-7-server-ose-3.9-rpms"     --enable="rhel-7-fast-datapath-rpms --enable="rhel-7-server-ansible-2.4-rpms"
 
   - name: Install necessary packages
     yum:  
@@ -29,12 +29,12 @@
     - sos 
     - psacct
     - atomic-openshift-utils
-    - docker-1.12.6
+    - docker-1.13.1
     - ipa-client
     - httpd-tools
 
-#  - name: configure IPA client
-#    command: ipa-client-install --server='{{ ipa_server }}' --domain='{{ domain }}' --hostname='{{ ansible_hostname }}'.'{{ domain }}' --principal='{{ ipa_user }}' --password='{{ ipa_password }}' --enable-dns-updates --unattended
+  - name: configure IPA client
+    command: ipa-client-install --server='{{ ipa_server }}' --domain='{{ domain }}' --hostname='{{ ansible_hostname }}'.'{{ domain }}' --principal='{{ ipa_user }}' --password='{{ ipa_password }}' --enable-dns-updates --unattended
 
   - name: configure docker storage
     template:

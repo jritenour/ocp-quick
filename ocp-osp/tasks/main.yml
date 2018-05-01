@@ -7,19 +7,19 @@
 #    debug:
 #      var: uuid_list.stdout
 
-#  - name: Create volume for /var for all instances
-#    os_volume:
-#      auth:
-#        auth_url: "{{ osp_url }}"
-#        username: "{{ osp_user }}"
-#        password: "{{ osp_pass }}"
-#        project_name: "{{ osp_project }}"
-#      state: present
-#      availability_zone: "{{ az }}"
-#      size: "{{ db_size }}"
-#      display_name: "{{ db_vol_name }}-{{ item }}"
-#    with_sequence:
-#      count={{ num }}
+  - name: Create volume for /var for all instances
+    os_volume:
+      auth:
+        auth_url: "{{ osp_url }}"
+        username: "{{ osp_user }}"
+        password: "{{ osp_pass }}"
+        project_name: "{{ osp_project }}"
+      state: present
+      availability_zone: "{{ az }}"
+      size: "{{ db_size }}"
+      display_name: "{{ db_vol_name }}-{{ item }}"
+    with_sequence:
+      count={{ num }}
 
   - name: launch instances
     os_server:
@@ -38,22 +38,23 @@
       flavor: "{{ flavor_name }}"
       security_groups: "{{ security_group }}"
       auto_ip: yes
-#      volumes:
-#        - "{{ db_vol_name }}-{{ num }}"
+      volumes:
+        - "{{ db_vol_name }}-{{ num }}"
     register: osp_host
     with_sequence:
       count={{ num }}
 
-  - name: debug
-    debug:
-      var: osp_host.results
+#  - name: debug
+#    debug:
+#      var: osp_host.results
 
-#  - name: wait for instances become ready to use
-#    wait_for:
-#     host: "{{ osp_host.openstack.public_v4 }}"
-#     port: "22"
-#     timeout: "320"
-#     state: "started"
+  - name: wait for instances become ready to use
+    wait_for:
+     host: "{{ item.openstack.public_v4 }}"
+     port: "22"
+     timeout: "320"
+     state: "started"
+    with_items: "{{ osp_host.results }}"
 
   - name: add master server to inventory
     add_host:
