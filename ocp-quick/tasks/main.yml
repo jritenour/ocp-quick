@@ -83,7 +83,6 @@
     service:
       name: dbus
       state: restarted
-    when: "'master' in group_names"
  
   - name: Set domain in resolve search list
     lineinfile:
